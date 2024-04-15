@@ -128,7 +128,49 @@
             document.getElementById(tabName + "Tab").style.display = "block";
             document.querySelector(".tab[data-tab='" + tabName + "']").classList.add("active");
         }
-    </script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Inicialmente, muestra la pestaña de la galería y marca como activa
+        openTab('gallery');
+        loadImages(); // Carga las imágenes cuando se carga el documento
+    });
+
+    function openTab(tabName) {
+        var i, tabContent, tabLinks;
+        tabContent = document.getElementsByClassName("tab-content");
+        for (i = 0; i < tabContent.length; i++) {
+            tabContent[i].style.display = "none";
+        }
+        tabLinks = document.getElementsByClassName("tab");
+        for (i = 0; i < tabLinks.length; i++) {
+            tabLinks[i].classList.remove("active");
+        }
+        document.getElementById(tabName + "Tab").style.display = "block";
+        document.querySelector(".tab[data-tab='" + tabName + "']").classList.add("active");
+    }
+
+    function loadImages() {
+        var galleryContainer = document.getElementById('galleryTab');
+        var imagesFolder = 'tu_carpeta_de_imagenes'; // Reemplaza 'tu_carpeta_de_imagenes' por la ruta de tu carpeta de imágenes
+
+        fetch(imagesFolder)
+            .then(response => response.text())
+            .then(text => {
+                var parser = new DOMParser();
+                var htmlDoc = parser.parseFromString(text, 'text/html');
+                var images = htmlDoc.querySelectorAll('a[href$=".jpg"], a[href$=".jpeg"], a[href$=".png"], a[href$=".gif"]');
+
+                images.forEach(image => {
+                    var imgSrc = image.getAttribute('href');
+                    var imgElement = document.createElement('img');
+                    imgElement.src = imagesFolder + '/' + imgSrc;
+                    galleryContainer.appendChild(imgElement);
+                });
+            })
+            .catch(error => console.error('Error loading images:', error));
+    }
+</script>
+
 
 </body>
 </html>
