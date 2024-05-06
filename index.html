@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Raspberry Pi Arducam 64mp Images</title>
+    <title>OBSEA Arducam 64mp</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -31,8 +31,8 @@
             margin-left: 10px;
         }
 
-        img {
-            height: 40px; /* Ajusta la altura según tus necesidades */
+        img.logo {
+            height: 40px;
             margin-right: 10px;
         }
 
@@ -43,7 +43,7 @@
             background-color: #0066cc;
             border-radius: 5px;
             transition: background-color 0.3s ease;
-            margin-left: auto; /* Mueve el enlace al margen derecho */
+            margin-left: auto;
         }
 
             a:hover {
@@ -51,8 +51,44 @@
             }
 
         main {
-            margin: 20px;
+            margin: 40px;
             flex: 1;
+            display: flex; /* Divide la pantalla en dos columnas */
+            flex-direction: column; /* Alinear las columnas verticalmente */
+        }
+
+        .tabs {
+            display: flex;
+            flex-direction: column; /* Alinear las pestañas verticalmente */
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 8px 12px; /* Ajusta el espacio interno según tus preferencias */
+            margin-right: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+            margin-bottom: 5px; /* Espacio entre las pestañas */
+        }
+
+            .tab.active {
+                background-color: #004080; /* Cambia el color de fondo de la pestaña activa */
+                color: white; /* Cambia el color del texto de la pestaña activa */
+            }
+
+        .content {
+            display: flex;
+            flex: 1; /* Ocupa todo el espacio disponible */
+        }
+
+        .left-column {
+            flex: 1; /* Toma la mitad del espacio disponible */
+            padding-right: 20px; /* Espacio entre las dos columnas */
+        }
+
+        .right-column {
+            flex: 1; /* Toma la otra mitad del espacio disponible */
         }
 
         footer {
@@ -61,30 +97,33 @@
             color: white;
             text-align: center;
         }
+
+        #galleryContent img {
+            width: 100px;
+            height: auto;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+            #galleryContent img:hover {
+                opacity: 0.7;
+            }
+
+            #galleryContent img:focus {
+                width: 300px;
+                transition: width 0.5s;
+                z-index: 1;
+            }
     </style>
 </head>
 <body>
 
     <header>
-        <img src="assets/medusablanca.png" alt="Logo">
-        <img src="assets/logoobseablanco.png" alt="Logo">
+        <img src="assets/medusablanca.png" alt="Logo" class="logo">
+        <img src="assets/logoobseablanco.png" alt="Logo" class="logo">
         <h1>Raspberry Pi Arducam 64mp Images</h1>
         <a href="https://www.obsea.es/" target="_blank">Home</a>
     </header>
-
-    <style>
-        .tab {
-            padding: 8px 12px; /* Ajusta el espacio interno según tus preferencias */
-            margin-right: 10px;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-            .tab.active {
-            background-color: #004080; /* Cambia el color de fondo de la pestaña activa */
-            color: white; /* Cambia el color del texto de la pestaña activa */
-        }
-    </style>
 
     <main>
         <p>Aquí va el resto del texto y las foticos yeyyy</p>
@@ -94,14 +133,22 @@
             <div class="tab" onclick="openTab('charts')" data-tab="charts">Gráficos Dinámicos</div>
         </div>
 
-        <div id="galleryTab" class="tab-content">
-            <!-- Contenido de la pestaña de Galería de Fotos -->
-            <p>Aquí va el contenido de la Galería de Fotos.</p>
-        </div>
+        <div class="content">
+            <div class="left-column">
+                <div id="galleryTab" class="tab-content">
+                    <!-- Contenido de la pestaña de Galería de Fotos -->
+                    <div id="galleryContent"></div>
+                </div>
 
-        <div id="chartsTab" class="tab-content">
-            <!-- Contenido de la pestaña de Gráficos Dinámicos -->
-            <p>Aquí va el contenido de los Gráficos Dinámicos.</p>
+                <div id="chartsTab" class="tab-content">
+                    <!-- Contenido de la pestaña de Gráficos Dinámicos -->
+                    <p>Aquí va el contenido de los Gráficos Dinámicos.</p>
+                </div>
+            </div>
+
+            <div class="right-column">
+                <p>Aquí va el resto del texto y las foticos yeyyy</p>
+            </div>
         </div>
     </main>
 
@@ -127,50 +174,50 @@
             }
             document.getElementById(tabName + "Tab").style.display = "block";
             document.querySelector(".tab[data-tab='" + tabName + "']").classList.add("active");
+
+            if (tabName === 'gallery') {
+                // Si se selecciona la pestaña de Galería de Fotos, cargar las imágenes
+                loadImages();
+            }
         }
-    <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        // Inicialmente, muestra la pestaña de la galería y marca como activa
-        openTab('gallery');
-        loadImages(); // Carga las imágenes cuando se carga el documento
-    });
 
-    function openTab(tabName) {
-        var i, tabContent, tabLinks;
-        tabContent = document.getElementsByClassName("tab-content");
-        for (i = 0; i < tabContent.length; i++) {
-            tabContent[i].style.display = "none";
+        function loadImages() {
+            var galleryContent = document.getElementById('galleryContent');
+            galleryContent.innerHTML = ''; // Limpiar el contenido existente
+
+            // Ruta de la carpeta de imágenes (cambia 'static/' por la ruta adecuada si es necesario)
+            var imagePath = 'static/';
+
+            // Hacer una solicitud AJAX para obtener la lista de archivos en la carpeta de imágenes
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', imagePath);
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    // Parsear la respuesta como HTML
+                    var doc = new DOMParser().parseFromString(xhr.responseText, 'text/html');
+                    // Obtener la lista de elementos <a> (enlaces) que representan los archivos en la carpeta
+                    var links = doc.querySelectorAll('a');
+                    // Iterar sobre los enlaces y crear elementos <img> para cada imagen
+                    links.forEach(function (link) {
+                        // Ignorar los enlaces al directorio padre y a la propia carpeta
+                        if (link.href !== window.location.href && link.href !== window.location.href + '/') {
+                            var img = document.createElement('img');
+                            img.src = imagePath + link.textContent;
+                            img.onclick = function () {
+                                // Al hacer clic en una imagen, muestra la versión grande en una nueva ventana
+                                window.open(this.src);
+                            };
+                            galleryContent.appendChild(img);
+                        }
+                    });
+                } else {
+                    console.error('Error al cargar la lista de imágenes.');
+                }
+            };
+            xhr.send();
         }
-        tabLinks = document.getElementsByClassName("tab");
-        for (i = 0; i < tabLinks.length; i++) {
-            tabLinks[i].classList.remove("active");
-        }
-        document.getElementById(tabName + "Tab").style.display = "block";
-        document.querySelector(".tab[data-tab='" + tabName + "']").classList.add("active");
-    }
 
-    function loadImages() {
-        var galleryContainer = document.getElementById('galleryTab');
-        var imagesFolder = 'Static'; // Reemplaza 'tu_carpeta_de_imagenes' por la ruta de tu carpeta de imágenes
-
-        fetch(imagesFolder)
-            .then(response => response.text())
-            .then(text => {
-                var parser = new DOMParser();
-                var htmlDoc = parser.parseFromString(text, 'text/html');
-                var images = htmlDoc.querySelectorAll('a[href$=".jpg"], a[href$=".jpeg"], a[href$=".png"], a[href$=".gif"]');
-
-                images.forEach(image => {
-                    var imgSrc = image.getAttribute('href');
-                    var imgElement = document.createElement('img');
-                    imgElement.src = imagesFolder + '/' + imgSrc;
-                    galleryContainer.appendChild(imgElement);
-                });
-            })
-            .catch(error => console.error('Error loading images:', error));
-    }
-</script>
-
+    </script>
 
 </body>
 </html>
