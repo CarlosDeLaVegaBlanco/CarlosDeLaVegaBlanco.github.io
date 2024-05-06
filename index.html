@@ -185,38 +185,23 @@
             var galleryContent = document.getElementById('galleryContent');
             galleryContent.innerHTML = ''; // Limpiar el contenido existente
 
-            // Ruta de la carpeta de imágenes (cambia 'static/' por la ruta adecuada si es necesario)
+            // Ruta de la carpeta de imágenes
             var imagePath = 'static/';
 
-            // Hacer una solicitud AJAX para obtener la lista de archivos en la carpeta de imágenes
-            var xhr = new XMLHttpRequest();
-            xhr.open('GET', imagePath);
-            xhr.onload = function () {
-                if (xhr.status === 200) {
-                    // Parsear la respuesta como HTML
-                    var doc = new DOMParser().parseFromString(xhr.responseText, 'text/html');
-                    // Obtener la lista de elementos <a> (enlaces) que representan los archivos en la carpeta
-                    var links = doc.querySelectorAll('a');
-                    // Iterar sobre los enlaces y crear elementos <img> para cada imagen
-                    links.forEach(function (link) {
-                        // Ignorar los enlaces al directorio padre y a la propia carpeta
-                        if (link.href !== window.location.href && link.href !== window.location.href + '/') {
-                            var img = document.createElement('img');
-                            img.src = imagePath + link.textContent;
-                            img.onclick = function () {
-                                // Al hacer clic en una imagen, muestra la versión grande en una nueva ventana
-                                window.open(this.src);
-                            };
-                            galleryContent.appendChild(img);
-                        }
-                    });
-                } else {
-                    console.error('Error al cargar la lista de imágenes.');
-                }
-            };
-            xhr.send();
-        }
+            // Array con los nombres de las imágenes (puedes incluirlos manualmente o cargarlos dinámicamente)
+            var imageNames = ['photo_2024_05_06-01_45_03.jpg', 'photo_2024_05_06-02_28_36.jpg', 'result_photo_2024_05_06-02_44_41.jpg', 'test02.jpg'];
 
+            // Recorrer el array de nombres de imágenes y crear elementos <img> para cada una
+            imageNames.forEach(function (imageName) {
+                var img = document.createElement('img');
+                img.src = imagePath + imageName;
+                img.onclick = function () {
+                    // Al hacer clic en una imagen, muestra la versión grande en una nueva ventana
+                    window.open(this.src);
+                };
+                galleryContent.appendChild(img);
+            });
+        }
     </script>
 
 </body>
