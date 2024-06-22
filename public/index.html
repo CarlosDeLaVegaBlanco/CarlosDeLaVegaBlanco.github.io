@@ -25,13 +25,16 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            fetch('/files')
+            fetch('/api/files')
                 .then(response => response.json())
                 .then(files => {
                     const fileListElement = document.getElementById('fileList');
                     files.forEach(file => {
                         const li = document.createElement('li');
-                        li.textContent = file;
+                        const a = document.createElement('a');
+                        a.href = `/static/${file}`;
+                        a.textContent = file;
+                        li.appendChild(a);
                         fileListElement.appendChild(li);
                     });
                 })
