@@ -53,42 +53,45 @@
         main {
             margin: 40px;
             flex: 1;
-            display: flex; /* Divide la pantalla en dos columnas */
-            flex-direction: column; /* Alinear las columnas verticalmente */
+            display: flex;
+            flex-direction: column;
         }
 
         .tabs {
             display: flex;
-            flex-direction: column; /* Alinear las pestañas verticalmente */
+            flex-direction: column;
             margin-bottom: 20px;
         }
 
         .tab {
-            padding: 8px 12px; /* Ajusta el espacio interno según tus preferencias */
+            padding: 8px 12px;
             margin-right: 10px;
             cursor: pointer;
             border-radius: 5px;
             transition: background-color 0.3s ease;
-            margin-bottom: 5px; /* Espacio entre las pestañas */
+            margin-bottom: 5px;
         }
 
         .tab.active {
-            background-color: #004080; /* Cambia el color de fondo de la pestaña activa */
-            color: white; /* Cambia el color del texto de la pestaña activa */
+            background-color: #004080;
+            color: white;
         }
 
         .content {
             display: flex;
-            flex: 1; /* Ocupa todo el espacio disponible */
+            flex: 1;
         }
 
         .left-column {
-            flex: 1; /* Toma la mitad del espacio disponible */
-            padding-right: 20px; /* Espacio entre las dos columnas */
+            flex: 1;
+            padding-right: 20px;
         }
 
         .right-column {
-            flex: 1; /* Toma la otra mitad del espacio disponible */
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         footer {
@@ -110,10 +113,10 @@
             opacity: 0.7;
         }
 
-        #galleryContent img:focus {
-            width: 300px;
-            transition: width 0.5s;
-            z-index: 1;
+        #resultImage {
+            max-width: 100%;
+            max-height: 100%;
+            display: none;
         }
     </style>
 </head>
@@ -127,8 +130,6 @@
     </header>
 
     <main>
-        <p>Aquí va el resto del texto y las foticos yeyyy</p>
-
         <div class="tabs">
             <div class="tab" onclick="openTab('gallery')" data-tab="gallery">Galería de Fotos</div>
             <div class="tab" onclick="openTab('charts')" data-tab="charts">Gráficos Dinámicos</div>
@@ -137,18 +138,16 @@
         <div class="content">
             <div class="left-column">
                 <div id="galleryTab" class="tab-content">
-                    <!-- Contenido de la pestaña de Galería de Fotos -->
                     <div id="galleryContent"></div>
                 </div>
 
                 <div id="chartsTab" class="tab-content">
-                    <!-- Contenido de la pestaña de Gráficos Dinámicos -->
                     <p>Aquí va el contenido de los Gráficos Dinámicos.</p>
                 </div>
             </div>
 
             <div class="right-column">
-                <p>Aquí va el resto del texto y las foticos yeyyy</p>
+                <img id="resultImage" alt="Imagen Resultante">
             </div>
         </div>
     </main>
@@ -159,7 +158,6 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            // Inicialmente, muestra la pestaña de la galería y marca como activa
             openTab('gallery');
         });
 
@@ -177,16 +175,14 @@
             document.querySelector(".tab[data-tab='" + tabName + "']").classList.add("active");
 
             if (tabName === 'gallery') {
-                // Si se selecciona la pestaña de Galería de Fotos, cargar las imágenes
                 loadImages();
             }
         }
 
         function loadImages() {
             var galleryContent = document.getElementById('galleryContent');
-            galleryContent.innerHTML = ''; // Limpiar el contenido existente
+            galleryContent.innerHTML = '';
 
-            // Hacer una solicitud al backend para obtener la lista de archivos
             fetch('/api/files')
                 .then(response => response.json())
                 .then(files => {
@@ -194,8 +190,7 @@
                         var img = document.createElement('img');
                         img.src = '/static/' + file;
                         img.onclick = function () {
-                            // Al hacer clic en una imagen, muestra la versión grande en una nueva ventana
-                            window.open(this.src);
+                            showResultImage(file);
                         };
                         galleryContent.appendChild(img);
                     });
@@ -203,6 +198,13 @@
                 .catch(error => {
                     console.error('Error al obtener la lista de archivos:', error);
                 });
+        }
+
+        function showResultImage(file) {
+            var resultImage = document.getElementById('resultImage');
+            var resultFileName = 'result_' + file;
+            resultImage.src = '/static/' + resultFileName;
+            resultImage.style.display = 'block';
         }
     </script>
 
