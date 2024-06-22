@@ -14,7 +14,9 @@ app.get('/api/files', (req, res) => {
         if (err) {
             return res.status(500).json({ error: 'No se pudo leer la carpeta' });
         }
-        res.json(files);
+        // Filtrar solo archivos de imagen
+        const imageFiles = files.filter(file => /\.(jpg|jpeg|png|gif)$/i.test(file));
+        res.json(imageFiles);
     });
 });
 
