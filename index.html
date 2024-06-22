@@ -195,9 +195,7 @@
         }
 
         function loadImages(tabName) {
-            var galleryContent = document.getElementById('galleryContent');
-            var chartsContent = document.getElementById('chartsContent');
-            var content = tabName === 'gallery' ? galleryContent : chartsContent;
+            var content = document.getElementById(tabName + 'Content');
             content.innerHTML = '';
 
             fetch('/api/files')
@@ -206,9 +204,6 @@
                     files.forEach(file => {
                         var img = document.createElement('img');
                         img.src = '/static/' + file;
-                        img.onerror = function() {
-                            console.error('Error al cargar la imagen:', img.src);
-                        };
                         img.onclick = function () {
                             if (tabName === 'gallery') {
                                 showResultImage(file);
@@ -226,6 +221,9 @@
 
         function showResultImage(file) {
             var resultImage = document.getElementById('resultImage');
+            var chartContainer = document.getElementById('chartContainer');
+            chartContainer.style.display = 'none';
+
             var resultFileName = 'result_' + file;
             var resultImagePath = '/static/' + resultFileName;
 
@@ -234,7 +232,6 @@
                     if (response.ok) {
                         resultImage.src = resultImagePath;
                         resultImage.style.display = 'block';
-                        document.getElementById('chartContainer').style.display = 'none';
                     } else {
                         resultImage.style.display = 'none';
                     }
@@ -243,7 +240,6 @@
                     console.error('Error al cargar la imagen de resultado:', error);
                     resultImage.style.display = 'none';
                 });
-        }
 
         function showChart(file) {
             var resultImage = document.getElementById('resultImage');
