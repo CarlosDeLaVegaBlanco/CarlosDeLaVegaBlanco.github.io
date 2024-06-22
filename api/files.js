@@ -8,7 +8,7 @@ const app = express();
 app.use('/static', express.static(path.join(__dirname, '../static')));
 
 // Servir archivos estáticos desde la carpeta "assets"
-app.use('/assets', express.static(path.join(__dirname, '../assets')));
+app.use('/assets', express.static(path.join(__dirname, '../public/assets')));
 
 // Endpoint para listar los archivos en la carpeta "static"
 app.get('/api/files', (req, res) => {
