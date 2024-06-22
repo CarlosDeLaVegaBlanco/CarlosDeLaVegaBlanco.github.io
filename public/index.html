@@ -123,8 +123,8 @@
 <body>
 
     <header>
-        <img src="/assets/medusablanca.png" alt="Logo" class="logo">
-        <img src="/assets/logoobseablanco.png" alt="Logo" class="logo">
+        <img src="assets/medusablanca.png" alt="Logo" class="logo">
+        <img src="assets/logoobseablanco.png" alt="Logo" class="logo">
         <h1>Raspberry Pi Arducam 64mp Images</h1>
         <a href="https://www.obsea.es/" target="_blank">Home</a>
     </header>
@@ -203,8 +203,23 @@
         function showResultImage(file) {
             var resultImage = document.getElementById('resultImage');
             var resultFileName = 'result_' + file;
-            resultImage.src = '/static/' + resultFileName;
-            resultImage.style.display = 'block';
+            var resultImagePath = '/static/' + resultFileName;
+
+            // Verifica si la imagen de resultado existe
+            fetch(resultImagePath)
+                .then(response => {
+                    if (response.ok) {
+                        resultImage.src = resultImagePath;
+                        resultImage.style.display = 'block';
+                    } else {
+                        // Oculta la imagen si no existe
+                        resultImage.style.display = 'none';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al cargar la imagen de resultado:', error);
+                    resultImage.style.display = 'none';
+                });
         }
     </script>
 
