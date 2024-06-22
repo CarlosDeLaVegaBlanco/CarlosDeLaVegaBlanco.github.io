@@ -192,6 +192,9 @@
                     files.forEach(file => {
                         var img = document.createElement('img');
                         img.src = '/static/' + file;
+                        img.onerror = function() {
+                            console.error('Error al cargar la imagen:', img.src);
+                        };
                         img.onclick = function () {
                             showResultImage(file);
                         };
