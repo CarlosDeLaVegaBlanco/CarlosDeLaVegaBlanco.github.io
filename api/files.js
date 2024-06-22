@@ -23,22 +23,9 @@ app.get('/api/files', (req, res) => {
     });
 });
 
-// Endpoint para servir el archivo JSON
-app.get('/api/data/:filename', (req, res) => {
-    const filename = req.params.filename;
-    const filePath = path.join(__dirname, '../static', filename);
-
-    fs.readFile(filePath, (err, data) => {
-        if (err) {
-            return res.status(404).json({ error: 'Archivo no encontrado' });
-        }
-        res.json(JSON.parse(data));
-    });
-});
-
-// Servir el archivo index.html
+// Servir el archivo index.html desde la raíz
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../public/index.html'));
+    res.sendFile(path.join(__dirname, '../index.html'));
 });
 
 module.exports = app;
