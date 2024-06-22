@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OBSEA Arducam 64mp</title>
+    <link rel="icon" href="/assets/favicon.ico">
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -101,7 +102,7 @@
             text-align: center;
         }
 
-        #galleryContent img {
+        #galleryContent img, #chartsContent img {
             width: 100px;
             height: 100px;
             object-fit: cover;
@@ -109,7 +110,7 @@
             cursor: pointer;
         }
 
-        #galleryContent img:hover {
+        #galleryContent img:hover, #chartsContent img:hover {
             opacity: 0.7;
         }
 
@@ -123,8 +124,8 @@
 <body>
 
     <header>
-        <img src="/public/assets/medusablanca.png" alt="Logo" class="logo">
-        <img src="/public/assets/logoobseablanco.png" alt="Logo" class="logo">
+        <img src="/assets/medusablanca.png" alt="Logo" class="logo">
+        <img src="/assets/logoobseablanco.png" alt="Logo" class="logo">
         <h1>Raspberry Pi Arducam 64mp Images</h1>
         <a href="https://www.obsea.es/" target="_blank">Home</a>
     </header>
@@ -142,7 +143,7 @@
                 </div>
 
                 <div id="chartsTab" class="tab-content">
-                    <p>Aquí va el contenido de los Gráficos Dinámicos.</p>
+                    <div id="chartsContent"></div>
                 </div>
             </div>
 
@@ -174,14 +175,16 @@
             document.getElementById(tabName + "Tab").style.display = "block";
             document.querySelector(".tab[data-tab='" + tabName + "']").classList.add("active");
 
-            if (tabName === 'gallery') {
-                loadImages();
+            if (tabName === 'gallery' || tabName === 'charts') {
+                loadImages(tabName);
             }
         }
 
-        function loadImages() {
+        function loadImages(tabName) {
             var galleryContent = document.getElementById('galleryContent');
-            galleryContent.innerHTML = '';
+            var chartsContent = document.getElementById('chartsContent');
+            var content = tabName === 'gallery' ? galleryContent : chartsContent;
+            content.innerHTML = '';
 
             fetch('/api/files')
                 .then(response => response.json())
@@ -192,7 +195,7 @@
                         img.onclick = function () {
                             showResultImage(file);
                         };
-                        galleryContent.appendChild(img);
+                        content.appendChild(img);
                     });
                 })
                 .catch(error => {
@@ -205,14 +208,12 @@
             var resultFileName = 'result_' + file;
             var resultImagePath = '/static/' + resultFileName;
 
-            // Verifica si la imagen de resultado existe
             fetch(resultImagePath)
                 .then(response => {
                     if (response.ok) {
                         resultImage.src = resultImagePath;
                         resultImage.style.display = 'block';
                     } else {
-                        // Oculta la imagen si no existe
                         resultImage.style.display = 'none';
                     }
                 })
