@@ -1,5 +1,4 @@
 {
-  "version": 2,
   "builds": [
     {
       "src": "api/files.js",
@@ -12,6 +11,10 @@
     {
       "src": "static/**/*",
       "use": "@vercel/static"
+    },
+    {
+      "src": "public/assets/**/*",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
@@ -22,6 +25,10 @@
     {
       "src": "/static/(.*)",
       "dest": "/static/$1"
+    },
+    {
+      "src": "/assets/(.*)",
+      "dest": "/public/assets/$1"
     },
     {
       "src": "/(.*)",
