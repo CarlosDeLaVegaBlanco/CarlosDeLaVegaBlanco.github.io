@@ -204,8 +204,8 @@
         }
 
         function loadImagesForCharts() {
-            var chartContainer = document.getElementById('chartContainer');
-            chartContainer.innerHTML = '';
+            var galleryContent = document.getElementById('chartContainer');
+            galleryContent.innerHTML = '';
 
             fetch('/api/files')
                 .then(response => response.json())
@@ -216,7 +216,7 @@
                         img.onclick = function () {
                             showChart(file);
                         };
-                        chartContainer.appendChild(img);
+                        galleryContent.appendChild(img);
                     });
                 })
                 .catch(error => {
@@ -268,7 +268,7 @@
                         data: {
                             labels: labels,
                             datasets: [{
-                                label: 'Frecuencia',
+                                label: 'Conteo',
                                 data: values,
                                 backgroundColor: 'rgba(75, 192, 192, 0.2)',
                                 borderColor: 'rgba(75, 192, 192, 1)',
