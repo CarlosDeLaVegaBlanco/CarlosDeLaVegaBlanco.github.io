@@ -102,7 +102,7 @@
             text-align: center;
         }
 
-        #galleryContent img, #chartsContent img {
+        #galleryContent img {
             width: 100px;
             height: 100px;
             object-fit: cover;
@@ -110,7 +110,7 @@
             cursor: pointer;
         }
 
-        #galleryContent img:hover, #chartsContent img:hover {
+        #galleryContent img:hover {
             opacity: 0.7;
         }
 
@@ -119,30 +119,18 @@
             max-height: 100%;
             display: none;
         }
-
-        #chartContainer {
-            width: 100%;
-            height: 100%;
-        }
-
-        #chart {
-            width: 100%;
-            height: 100%;
-        }
     </style>
 </head>
 <body>
 
     <header>
-        <img src="./assets/medusablanca.png" alt="Logo" class="logo">
-        <img src="./assets/logoobseablanco.png" alt="Logo" class="logo">
+        <img src="/assets/medusablanca.png" alt="Logo" class="logo">
+        <img src="/assets/logoobseablanco.png" alt="Logo" class="logo">
         <h1>Raspberry Pi Arducam 64mp Images</h1>
         <a href="https://www.obsea.es/" target="_blank">Home</a>
     </header>
 
     <main>
-        <p>En esta página se publican las imágenes obtenidas de la cámara Arducam 64mp en tiempo real.</p>
-        
         <div class="tabs">
             <div class="tab" onclick="openTab('gallery')" data-tab="gallery">Galería de Fotos</div>
             <div class="tab" onclick="openTab('charts')" data-tab="charts">Gráficos Dinámicos</div>
@@ -155,15 +143,12 @@
                 </div>
 
                 <div id="chartsTab" class="tab-content">
-                    <div id="chartsContent"></div>
+                    <div id="chartContainer"></div>
                 </div>
             </div>
 
             <div class="right-column">
                 <img id="resultImage" alt="Imagen Resultante">
-                <div id="chartContainer">
-                    <canvas id="chart"></canvas>
-                </div>
             </div>
         </div>
     </main>
@@ -172,7 +157,6 @@
         <p>&copy; 2024 Carlos de la Vega Blanco.</p>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             openTab('gallery');
@@ -191,16 +175,16 @@
             document.getElementById(tabName + "Tab").style.display = "block";
             document.querySelector(".tab[data-tab='" + tabName + "']").classList.add("active");
 
-            if (tabName === 'gallery' || tabName === 'charts') {
-                loadImages(tabName);
+            if (tabName === 'gallery') {
+                loadImages();
+            } else if (tabName === 'charts') {
+                loadImagesForCharts();
             }
         }
 
-        function loadImages(tabName) {
+        function loadImages() {
             var galleryContent = document.getElementById('galleryContent');
-            var chartsContent = document.getElementById('chartsContent');
-            var content = tabName === 'gallery' ? galleryContent : chartsContent;
-            content.innerHTML = '';
+            galleryContent.innerHTML = '';
 
             fetch('/api/files')
                 .then(response => response.json())
@@ -208,17 +192,31 @@
                     files.forEach(file => {
                         var img = document.createElement('img');
                         img.src = '/static/' + file;
-                        img.onerror = function() {
-                            console.error('Error al cargar la imagen:', img.src);
-                        };
                         img.onclick = function () {
-                            if (tabName === 'gallery') {
-                                showResultImage(file);
-                            } else if (tabName === 'charts') {
-                                showChart(file);
-                            }
+                            showResultImage(file);
                         };
-                        content.appendChild(img);
+                        galleryContent.appendChild(img);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error al obtener la lista de archivos:', error);
+                });
+        }
+
+        function loadImagesForCharts() {
+            var chartContainer = document.getElementById('chartContainer');
+            chartContainer.innerHTML = '';
+
+            fetch('/api/files')
+                .then(response => response.json())
+                .then(files => {
+                    files.forEach(file => {
+                        var img = document.createElement('img');
+                        img.src = '/static/' + file;
+                        img.onclick = function () {
+                            showChart(file);
+                        };
+                        chartContainer.appendChild(img);
                     });
                 })
                 .catch(error => {
@@ -236,7 +234,6 @@
                     if (response.ok) {
                         resultImage.src = resultImagePath;
                         resultImage.style.display = 'block';
-                        document.getElementById('chartContainer').style.display = 'none';
                     } else {
                         resultImage.style.display = 'none';
                     }
@@ -250,28 +247,31 @@
         function showChart(file) {
             var resultImage = document.getElementById('resultImage');
             resultImage.style.display = 'none';
-            var chartContainer = document.getElementById('chartContainer');
-            chartContainer.style.display = 'block';
 
             var resultFileName = file.replace(/\.[^/.]+$/, "") + '.json';
-            var resultDataPath = '/static/' + resultFileName;
+            var jsonFilePath = '/static/' + resultFileName;
 
-            fetch(resultDataPath)
+            fetch(jsonFilePath)
                 .then(response => response.json())
                 .then(data => {
+                    var chartContainer = document.getElementById('chartContainer');
+                    chartContainer.innerHTML = '';
+
                     var labels = Object.keys(data);
                     var values = Object.values(data);
 
-                    var ctx = document.getElementById('chart').getContext('2d');
-                    new Chart(ctx, {
+                    var canvas = document.createElement('canvas');
+                    chartContainer.appendChild(canvas);
+
+                    new Chart(canvas, {
                         type: 'bar',
                         data: {
                             labels: labels,
                             datasets: [{
-                                label: 'Conteo',
+                                label: 'Frecuencia',
                                 data: values,
-                                backgroundColor: 'rgba(0, 99, 132, 0.6)',
-                                borderColor: 'rgba(0, 99, 132, 1)',
+                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                borderColor: 'rgba(75, 192, 192, 1)',
                                 borderWidth: 1
                             }]
                         },
@@ -285,7 +285,7 @@
                     });
                 })
                 .catch(error => {
-                    console.error('Error al cargar los datos del gráfico:', error);
+                    console.error('Error al cargar el archivo JSON:', error);
                 });
         }
     </script>
